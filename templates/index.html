@@ -29,14 +29,20 @@
               <button type="submit" class="btn btn-primary">Submit</button>
             </form>
           </div>
-          {%- for comment in comments -%}
-            <a href="#{{loop.index}}" class="list-group-item list-group-item-action flex-column align-items-start">
-              <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">{{ comment.title }}</h5>
-              </div>
-              <p class="mb-1">{{ comment.content }}</p>
+          {%- if comments -%}
+            {%- for comment in comments -%}
+              <a href="#{{loop.index}}" class="list-group-item list-group-item-action flex-column align-items-start">
+                <div class="d-flex w-100 justify-content-between">
+                  <h5 class="mb-1">{{ comment.title }}</h5>
+                </div>
+                <p class="mb-1">{{ comment.content }}</p>
+              </a>
+            {%- endfor -%}
+          {%- else -%}
+            <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+              <p class="mb-1">No comments yet.</p>
             </a>
-          {%- endfor -%}
+          {%- endif -%}
         </div>
       </div>
     </main>
