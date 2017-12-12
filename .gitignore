@@ -107,3 +107,12 @@ ENV/
 !.vscode/launch.json
 !.vscode/extensions.json
 .history
+
+### Database ###
+*.accdb
+*.db
+*.dbf
+*.mdb
+*.pdb
+*.sql
+*.sqlite3
