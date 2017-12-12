@@ -22,7 +22,6 @@ Sample has three different parts:
         - `collections.namedtuple`
     5. List of comments
     6. Form to post comments
-    7. Upload files for user comments
 2. Persistence with _peewee_
     1. Comment class
     2. Create database of SQLite
