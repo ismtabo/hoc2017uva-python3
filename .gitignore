@@ -116,3 +116,6 @@ ENV/
 *.pdb
 *.sql
 *.sqlite3
+
+### Config file ###
+*.ini

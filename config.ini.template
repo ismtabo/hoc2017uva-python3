@@ -1,0 +1,5 @@
+[flask]
+debug = true
+
+[telegram]
+token = YOUR_TOKEN_HERE
