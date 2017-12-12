@@ -13,11 +13,15 @@
 
     <main role="main" class="container">
       <div class="starter-template">
-        {% if name %}
-          <h1>Hello {{ name }}!</h1>
-        {% else %}
-          <h1>Hello, World!</h1>
-        {% endif %}
+        <h1>Guestbook:</h1>
+        <div class="list-group">
+          <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+            <div class="d-flex w-100 justify-content-between">
+              <h5 class="mb-1">{{ comment[0] }}</h5>
+            </div>
+            <p class="mb-1">{{ comment[1] }}</p>
+          </a>
+        </div>
       </div>
     </main>
   
