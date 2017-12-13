@@ -61,7 +61,7 @@ $ git checkout <tag_name>
 
 For first step, it will be:
 ```
-$ git checkout v1.1-flask-templates
+$ git checkout v1.0-flask-hello-world
 ```
 
 In case, you want to advance in the tutorial but you already have done changes in the code, first discard this changes with:
