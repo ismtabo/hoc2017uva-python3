@@ -1,3 +1,4 @@
+import emoji
 import telepot
 from flask import Flask, render_template, request
 from flask_ini import FlaskIni
@@ -30,7 +31,26 @@ class MessageCounter(telepot.helper.ChatHandler):
         super(MessageCounter, self).__init__(*args, **kwargs)
 
     def on_chat_message(self, msg):
-        self.sender.sendMessage("Hello World!")
+        if not 'text' in msg or not msg['text'].startswith('/newcomment'):
+            self.sender.sendMessage(emoji.emojize("Sorry, but I can't understand you! :confused:", use_aliases=True))
+            return
+
+        text = msg['text'].lstrip()
+        _, comment = text.split(' ', 1)             # Discard command
+        title, *content = comment.split('\n', 1)    # Split comment members
+
+        if not content:
+            content = title
+            title = msg['from']['first_name']
+            if 'last_name' in msg['from']:
+                title += " "+msg['from']['last_name']
+            title += " says"
+        else:
+            content = content[0]
+
+        create_comment(title, content)
+
+        self.sender.sendMessage(emoji.emojize("Comment added to guestbook. :grin:", use_aliases=True))
 
 
 bot = telepot.DelegatorBot(app.iniconfig.get('telegram', 'token'), [
@@ -44,7 +64,7 @@ updates = bot.getUpdates()
 
 if updates:
     last_update_id = updates[-1]['update_id']
-    bot.getUpdates(offset=last_update_id+1)
+    bot.getUpdates(offset=last_update_id + 1)
 
 # Run telepot bot
 MessageLoop(bot).run_as_thread()
