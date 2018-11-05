@@ -1,0 +1,25 @@
+[[source]]
+
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+
+[packages]
+
+Flask = "<=0.12.2"
+peewee = "<=2.10.2"
+telepot = "<=12.5"
+Flask-ini = "*"
+emoji = "*"
+Flask-SocketIO = "*"
+eventlet = "*"
+
+
+[dev-packages]
+
+
+
+[requires]
+
+python_version = "3.6"

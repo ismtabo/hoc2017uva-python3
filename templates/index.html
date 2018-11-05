@@ -1,8 +1,9 @@
 <!doctype html>
 <html>
   <head>
-    <title>Hour of Code 2015</title>
-    <link rel="shortcut icon" href="https://hourofcode.com/images/icons/favicon.ico" />
+    <title>Feria del Ingenio</title>
+    <!--<link rel="shortcut icon" href="https://hourofcode.com/images/icons/favicon.ico" />-->
+    <link rel="shortcut icon" href="https://www.inf.uva.es/wp-content/ata-images/etsii.ico" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
     <link rel="stylesheet" href="https://getbootstrap.com/docs/4.0/examples/starter-template/starter-template.css">
     <style>
@@ -17,41 +18,42 @@
   <body>
 
     <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-      <a class="navbar-brand" href="#">Hour of Code 2017</a>
+      <a class="navbar-brand" href="#">Feria del Ingenio 2018</a>
     </nav>
 
-    <main role="main" class="container">
+    <main role="main" class="container" id="app">
       <div class="starter-template">
-        <h1>Guestbook:</h1>
+        <h1>Libro de visitas:</h1>
+        <p>
+          No seas tímido añade tu comentario sobre el evento y dinos que te parecen los stands. También puedes hacerlo a través del bot de Telegram <a href="http://t.me/feriadelingeniobot">@feriadelingeniobot</a>
+        </p>
         <div id="comments" class="list-group">
           <div class="list-group-item list-group-item-action flex-column align-items-start">
             <div class="d-flex w-100 justify-content-between">
-              <h5 class="mb-1">Submit new comment</h5>
+              <h5 class="mb-1">Añade tu comentario</h5>
             </div>
-            <form method="post">
+            <!--<form method="post">-->
               <div class="form-group">
-                <input type="text" class="form-control" name="title" id="title" aria-describedby="titleHelp" placeholder="Enter title">
+                <input type="text" class="form-control" name="title" id="title" aria-describedby="titleHelp" placeholder="Tu nombre"
+                v-model="newComment.title">
               </div>
               <div class="form-group">
-                <textarea class="form-control" name="content" id="content" rows="3" placeholder="Example content"></textarea>
+                <textarea class="form-control" name="content" id="content" rows="3" placeholder="Tu comentario"
+                v-model="newComment.content">
+                </textarea>
               </div>
-              <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
+              <button @click="sendComment" class="btn btn-primary">Submit</button>
+            <!--</form>-->
           </div>
-          {%- if comments -%}
-            {%- for comment in comments -%}
-              <a href="#{{loop.index}}" class="list-group-item list-group-item-action flex-column align-items-start">
-                <div class="d-flex w-100 justify-content-between">
-                  <h5 class="mb-1">{{ comment.title }}</h5>
-                </div>
-                <p class="mb-1">{{ comment.content }}</p>
-              </a>
-            {%- endfor -%}
-          {%- else -%}
-            <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-              <p class="mb-1">No comments yet.</p>
+            <a href="#" class="list-group-item list-group-item-action flex-column align-items-start" v-for="comment in comments">
+              <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">[[ comment.title ]]</h5>
+              </div>
+              <p class="mb-1">[[ comment.content ]]</p>
             </a>
-          {%- endif -%}
+            <!--<a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+              <p class="mb-1">Todavía no hay comentarios</p>
+            </a>-->
         </div>
       </div>
     </main>
@@ -59,5 +61,66 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+
+    <!-- Importamos socket.io -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.slim.js"></script>
+    <!-- Importamos VueJS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.3/vue.min.js"></script>
+
+    <script>
+      // Conectamos con nuestro dominio
+      var socket = io.connect('{{ domain }}');
+      // Instanciamos VueJS
+      var app = new Vue({
+          el: "#app",
+          delimiters: ['[[', ']]'],
+          data: {
+              // Le damos los mensajes del hitorial
+              comments: [
+              {% for comment in comments %}
+                  {
+                      title: '{{ comment.title }}',
+                      content: '{{ comment.content }}'
+                  }{% if not loop.last %},{% endif %}
+              {% endfor %}
+              ],
+              newComment: {
+                title: '',
+                content: ''
+              }
+          },
+          methods: {
+              sendComment: () => {
+                  // Enviamos el nuevo mensaje
+                  socket.emit('new_comment', {
+                      channel: app.channel,
+                      title: app.newComment.title,
+                      content: app.newComment.content
+                  });
+                  // Clear text
+                  app.$set(app, 'newComment', {
+                    title: '',
+                    content: ''
+                  });
+              }
+          }
+      });
+
+      socket.on('connect', function() {
+          console.log('Connect')
+      });
+
+      socket.on('new_comment', function(comment) {
+          console.log('Received', comment);
+          // Recibimos los nuevos mensajes y los añadimos a nuestro array
+          let comments = app.comments;
+          comments.push({
+              title: comment.title,
+              content: comment.content
+          })
+          app.$set(app, 'comments', comments);
+      });
+    </script>
+
   </body>
 </html>
